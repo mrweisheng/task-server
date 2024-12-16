@@ -71,22 +71,42 @@ router.post('/register', registerValidation, async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log('\n=== 登录过程追踪 ===');
+    console.log('1. 尝试登录用户:', username);
     
     const user = await User.findOne({ where: { username } });
     if (!user) {
+      console.log('2. 用户不存在');
       return res.status(401).json({ message: '用户名或密码错误' });
     }
+
+    console.log('2. 数据库中的用户信息:', {
+      id: user.id,
+      username: user.username,
+      passwordHash: user.password
+    });
+
+    console.log('3. 开始验证密码');
+    console.log('   输入的密码:', password);
+    console.log('   数据库中的密码哈希:', user.password);
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('4. 密码验证结果:', isMatch);
+
     if (!isMatch) {
+      console.log('5. 密码不匹配');
       return res.status(401).json({ message: '用户名或密码错误' });
     }
 
+    console.log('5. 密码验证通过，生成 token');
     const token = jwt.sign(
       { id: user.id, username: user.username },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    console.log('6. 登录成功');
+    console.log('=== 登录过程结束 ===\n');
 
     res.json({
       message: '登录成功',

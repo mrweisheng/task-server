@@ -1,6 +1,8 @@
 # 环境变量文件
 .env
 .env.render
+.env.production
+.env.development
 # 依赖目录
 node_modules/
 
