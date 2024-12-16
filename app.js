@@ -13,6 +13,13 @@ const app = express();
 // 中间件
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// 添加内容类型中间件
+app.use((req, res, next) => {
+  res.header('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
 
 // 添加安全中间件
 app.use(helmet());
@@ -23,6 +30,28 @@ const limiter = rateLimit({
   max: 100 // 限制每个IP 100个请求
 });
 app.use(limiter);
+
+// 在现有的中间件之后添加
+app.use((req, res, next) => {
+  if (req.body && req.body.nickname) {
+    // 确保请求体中的中文正确编码
+    req.body.nickname = Buffer.from(req.body.nickname).toString();
+  }
+  next();
+});
+
+// 在路由之前添加日志中间件
+app.use((req, res, next) => {
+  if (req.body && req.body.nickname) {
+    console.log('\n=== 请求编码追踪 ===');
+    console.log('1. 原始昵称:', req.body.nickname);
+    console.log('2. Buffer 内容:', Buffer.from(req.body.nickname));
+    console.log('3. Buffer 转 UTF8:', Buffer.from(req.body.nickname).toString('utf8'));
+    console.log('4. 字符编码:', Buffer.from(req.body.nickname).toString('utf8').length, '字节');
+    console.log('=== 追踪结束 ===\n');
+  }
+  next();
+});
 
 // 路由
 app.use('/api/user', userRoutes);
@@ -48,8 +77,8 @@ if (!process.env.PORT) {
   console.warn('警告: 未设置 PORT 环境变量，使用默认值 3000');
 }
 
-sequelize.sync().then(() => {
-  console.log('数据库已连接');
+sequelize.sync({ alter: true }).then(() => {
+  console.log('数据库表结构已同步');
   app.listen(PORT, () => {
     console.log(`服务器运行在端口 ${PORT}`);
   });

@@ -4,24 +4,30 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { auth } = require('../middleware/auth');
 const User = require('../models/User');
+const sequelize = require('../config/database');
 const { body, validationResult } = require('express-validator');
 
 // 添加注册验证规则
 const registerValidation = [
   body('username').isLength({ min: 3 }).trim().escape(),
   body('password').isLength({ min: 6 }),
-  body('nickname').isLength({ min: 2 }).trim().escape()
+  body('nickname').isLength({ min: 2 }).trim()
 ];
 
 // 用户注册
 router.post('/register', registerValidation, async (req, res) => {
+  console.log('\n=== 注册过程编码追踪 ===');
+  const { username, password, nickname } = req.body;
+  
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
+
+  console.log('1. 接收到的昵称:', nickname);
+  console.log('2. 昵称编码:', Buffer.from(nickname).toString('utf8'));
+
   try {
-    const { username, password, nickname } = req.body;
-    
     const existingUser = await User.findOne({ where: { username } });
     if (existingUser) {
       return res.status(400).json({ message: '用户名已存在' });
@@ -36,6 +42,16 @@ router.post('/register', registerValidation, async (req, res) => {
       nickname
     });
 
+    console.log('3. 存储后的昵称:', user.nickname);
+    
+    // 修改查询方式
+    const encodingResult = await sequelize.query('SHOW client_encoding;', {
+      type: sequelize.QueryTypes.SELECT
+    });
+    console.log('4. 数据库编码:', encodingResult[0].client_encoding);
+    console.log('5. 完整的编码信息:', encodingResult[0]);
+    console.log('=== 追踪结束 ===\n');
+
     res.status(201).json({
       message: '注册成功',
       user: {
@@ -45,6 +61,8 @@ router.post('/register', registerValidation, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('注册错误:', error);
+    console.error('错误详情:', error.stack);
     res.status(500).json({ message: '服务器错误', error: error.message });
   }
 });
@@ -80,6 +98,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('登录错误:', error);
     res.status(500).json({ message: '服务器错误', error: error.message });
   }
 });
@@ -87,15 +106,21 @@ router.post('/login', async (req, res) => {
 // 获取用户信息
 router.get('/profile', auth, async (req, res) => {
   try {
-    console.log('用户ID:', req.user.id);
+    console.log('查询用户信息:', req.user.id);
     const user = await User.findByPk(req.user.id, {
       attributes: ['id', 'username', 'nickname']
     });
     
     if (!user) {
-      return res.status(404).json({ message: '用户不存在' });
+      console.log('用户不存在，重新注册用户');
+      // 如果用户不存在，返回特殊状态码
+      return res.status(498).json({ 
+        message: '用户信息已过期，请重新登录',
+        code: 'USER_EXPIRED'
+      });
     }
     
+    console.log('查询到的用户信息:', user.toJSON());
     res.json(user);
   } catch (error) {
     console.error('获取用户信息错误:', error);
