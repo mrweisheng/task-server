@@ -53,6 +53,20 @@ app.use((req, res, next) => {
   next();
 });
 
+// 在其他路由之前添加根路径处理
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: '任务管理系统API服务正在运行',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      user: '/api/user',
+      tasks: '/api/tasks',
+      stats: '/api/stats'
+    }
+  });
+});
+
 // 路由
 app.use('/api/user', userRoutes);
 app.use('/api/tasks', taskRoutes);
