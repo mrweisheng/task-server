@@ -7,6 +7,9 @@ const taskRoutes = require('./routes/taskRoutes');
 const statsRoutes = require('./routes/statsRoutes');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const User = require('./models/User');
+const Task = require('./models/Task');
+const { Op } = require('sequelize');
 
 const app = express();
 
@@ -91,8 +94,30 @@ if (!process.env.PORT) {
   console.warn('警告: 未设置 PORT 环境变量，使用默认值 3000');
 }
 
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync({ alter: false }).then(async () => {
+  console.log('开始清理无效数据...');
+  
+  // 获取所有有效的用户ID
+  const users = await User.findAll({
+    attributes: ['id']
+  });
+  const validUserIds = users.map(user => user.id);
+  
+  // 删除无效的任务记录
+  await Task.destroy({
+    where: {
+      user_id: {
+        [Op.notIn]: validUserIds
+      }
+    }
+  });
+  
+  console.log('数据清理完成');
+  
+  // 现在可以安全地更新表结构
+  await sequelize.sync({ alter: true });
   console.log('数据库表结构已同步');
+  
   app.listen(PORT, () => {
     console.log(`服务器运行在端口 ${PORT}`);
   });

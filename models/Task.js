@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const User = require('./User');
 
 const Task = sequelize.define('Task', {
   id: {
@@ -37,6 +38,12 @@ const Task = sequelize.define('Task', {
   underscored: true,
   createdAt: 'created_at',
   updatedAt: 'updated_at'
+});
+
+// 添加与User的关联
+Task.belongsTo(User, {
+  foreignKey: 'user_id',
+  as: 'user'
 });
 
 module.exports = Task; 

@@ -4,6 +4,9 @@ const multer = require('multer');
 const { auth } = require('../middleware/auth');
 const Task = require('../models/Task');
 const { uploadToOSS } = require('../utils/upload');
+const User = require('../models/User');
+const { apiKeyAuth } = require('../middleware/apiKeyAuth');
+const { adminApiLimiter } = require('../middleware/apiKeyAuth');
 
 // 配置 multer 用于处理文件上传
 const upload = multer({
@@ -165,6 +168,44 @@ router.get('/latest', auth, async (req, res) => {
   } catch (error) {
     console.error('获取最新任务失败:', error);
     res.status(500).json({ message: '服务器错误', error: error.message });
+  }
+});
+
+// 获取所有待处理任务
+router.get('/pending', adminApiLimiter, apiKeyAuth, async (req, res) => {
+  try {
+    const pendingTasks = await Task.findAll({
+      where: {
+        status: '待处理'
+      },
+      include: [{
+        model: User,
+        as: 'user',
+        attributes: ['username', 'nickname']
+      }],
+      attributes: [
+        'id',
+        'content',
+        'numbers',
+        'media_urls',
+        'media_type',
+        'created_at',
+        'updated_at'
+      ],
+      order: [['created_at', 'DESC']]
+    });
+
+    res.json({
+      message: '获取成功',
+      total: pendingTasks.length,
+      tasks: pendingTasks
+    });
+  } catch (error) {
+    console.error('获取待处理任务失败:', error);
+    res.status(500).json({ 
+      message: '服务器错误', 
+      error: error.message 
+    });
   }
 });
 
