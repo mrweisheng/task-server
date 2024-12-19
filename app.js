@@ -94,6 +94,10 @@ if (!process.env.PORT) {
   console.warn('警告: 未设置 PORT 环境变量，使用默认值 3000');
 }
 
+if (!process.env.TASK_EXECUTOR_API) {
+  console.warn('警告: 未设置 TASK_EXECUTOR_API 环境变量');
+}
+
 sequelize.sync({ alter: false }).then(async () => {
   console.log('开始清理无效数据...');
   
