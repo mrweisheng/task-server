@@ -31,6 +31,10 @@ const Task = sequelize.define('Task', {
   status: {
     type: DataTypes.STRING(50),
     defaultValue: '待处理'
+  },
+  taskId: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 }, {
   tableName: 'tasks',

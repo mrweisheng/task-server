@@ -25,6 +25,7 @@ CREATE TABLE tasks (
     media_urls JSONB DEFAULT '[]'::jsonb,
     media_type VARCHAR(50),
     status VARCHAR(50) DEFAULT '待处理',
+    "taskId" VARCHAR(255),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

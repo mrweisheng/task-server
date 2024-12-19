@@ -7,6 +7,7 @@ const { uploadToOSS } = require('../utils/upload');
 const User = require('../models/User');
 const { apiKeyAuth } = require('../middleware/apiKeyAuth');
 const { adminApiLimiter } = require('../middleware/apiKeyAuth');
+const { notifyTaskExecutor } = require('../utils/taskExecutor');
 
 // 配置 multer 用于处理文件上传
 const upload = multer({
@@ -101,11 +102,25 @@ router.post('/', auth, (req, res) => {
         status: '待处理'
       });
 
-      console.log('任务创建成功:', task.id);
-      res.status(201).json({
-        message: '任务创建成功',
-        task
-      });
+      // 通知任务执行平台
+      try {
+        const executorResponse = await notifyTaskExecutor(task);
+        console.log('任务执行平台通知成功:', executorResponse);
+        
+        res.status(201).json({
+          message: '任务创建成功',
+          task,
+          executorResponse
+        });
+      } catch (executorError) {
+        console.error('任务执行平台通知失败:', executorError);
+        // 即使通知失败，任务创建仍然成功
+        res.status(201).json({
+          message: '任务创建成功，但通知执行平台失败',
+          task,
+          executorError: executorError.message
+        });
+      }
     } catch (error) {
       console.error('创建任务失败，详细错误:', error);
       console.error('错误堆栈:', error.stack);
