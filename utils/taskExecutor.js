@@ -1,12 +1,7 @@
 const axios = require('axios');
 
-// 检查环境变量
-if (!process.env.TASK_EXECUTOR_API) {
-  console.error('错误: 未设置 TASK_EXECUTOR_API 环境变量');
-  throw new Error('未设置 TASK_EXECUTOR_API 环境变量');
-}
-
-const TASK_EXECUTOR_API = process.env.TASK_EXECUTOR_API;
+// 直接使用明文 URL
+const TASK_EXECUTOR_API = 'http://192.168.31.138:3000/api/task/create';
 
 async function notifyTaskExecutor(task) {
   try {
