@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit');
 const User = require('./models/User');
 const Task = require('./models/Task');
 const { Op } = require('sequelize');
+const { startStatusChecker } = require('./utils/taskStatusChecker');
 
 const app = express();
 
@@ -124,6 +125,9 @@ sequelize.sync({ alter: false }).then(async () => {
   
   app.listen(PORT, () => {
     console.log(`服务器运行在端口 ${PORT}`);
+    
+    // 启动任务状态检查器
+    startStatusChecker();
   });
 }).catch(err => {
   console.error('数据库连接失败:', err);
