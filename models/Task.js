@@ -35,6 +35,11 @@ const Task = sequelize.define('Task', {
   taskId: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  ai_revise: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
   tableName: 'tasks',

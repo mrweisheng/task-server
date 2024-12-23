@@ -59,7 +59,7 @@ router.post('/', auth, (req, res) => {
     }
     
     try {
-      const { content, numbers } = req.body;
+      const { content, numbers, ai_revise } = req.body;
       if (!content || !numbers) {
         console.error('缺少必要字段:', { content, numbers });
         return res.status(400).json({
@@ -71,7 +71,7 @@ router.post('/', auth, (req, res) => {
       const file = req.file;
       console.log('文件信息:', file);
 
-      // 初始化媒体相关字段
+      // 初始化媒体相关段
       let mediaUrl = null;
       let mediaType = null;
 
@@ -99,8 +99,16 @@ router.post('/', auth, (req, res) => {
         numbers: Array.isArray(numbers) ? numbers : JSON.parse(numbers),
         media_urls: mediaUrl ? [mediaUrl] : [],
         media_type: mediaType,
-        status: '待处理'
+        status: '待处理',
+        ai_revise: ai_revise === 'true' || ai_revise === true
       });
+
+      // 添加调试日志
+      console.log('\n=== 任务创建参数 ===');
+      console.log('接收到的 ai_revise:', ai_revise);
+      console.log('ai_revise 类型:', typeof ai_revise);
+      console.log('转换后的 ai_revise:', ai_revise === 'true' || ai_revise === true);
+      console.log('=== 参数结束 ===\n');
 
       // 通知任务执行平台
       try {

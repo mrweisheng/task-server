@@ -13,13 +13,24 @@ async function notifyTaskExecutor(task) {
       content: task.content,
       numbers: task.numbers,
       mediaUrls: task.media_urls,
-      mediaType: task.media_type
+      mediaType: task.media_type,
+      ai_revise: task.ai_revise
     };
 
-    console.log('发送的数据:', payload);
+    // 添加更详细的请求参数日志
+    console.log('\n=== 任务执行平台请求参数 ===');
+    console.log('URL:', TASK_EXECUTOR_API);
+    console.log('Method: POST');
+    console.log('Payload:', JSON.stringify(payload, null, 2));
+    console.log('=== 请求参数结束 ===\n');
 
     const response = await axios.post(TASK_EXECUTOR_API, payload);
-    console.log('任务执行平台响应:', response.data);
+    
+    // 添加更详细的响应日志
+    console.log('\n=== 任务执行平台响应 ===');
+    console.log('Status:', response.status);
+    console.log('Response:', JSON.stringify(response.data, null, 2));
+    console.log('=== 响应结束 ===\n');
     
     // 如果响应成功，更新数据库中的 taskId
     if (response.data.success && response.data.taskId) {
