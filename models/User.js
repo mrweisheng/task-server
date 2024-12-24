@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const bcrypt = require('bcryptjs');
 
 const User = sequelize.define('User', {
   id: {
@@ -20,10 +19,40 @@ const User = sequelize.define('User', {
   nickname: {
     type: DataTypes.STRING(255),
     allowNull: false
+  },
+  status: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    defaultValue: 'active'
+  },
+  disabled_at: {
+    type: DataTypes.DATE,
+    allowNull: true
+  },
+  disabled_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'admins',
+      key: 'id'
+    }
+  },
+  disabled_reason: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    field: 'createdAt'
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    field: 'updatedAt'
   }
 }, {
   tableName: 'users',
   timestamps: true,
+  underscored: false,
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 });

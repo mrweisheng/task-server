@@ -122,7 +122,7 @@ Headers:
 
 成功响应 (200):
 {
-    "message": "用户已禁用",
+    "message": "用户已禁��",
     "user": {
         "id": 1,
         "username": "user1",
@@ -146,6 +146,39 @@ Headers:
         "username": "user1",
         "status": "active"
     }
+}
+
+3.4 删除用户
+URL: DELETE /api/admin/users/:id
+Headers: 
+- Authorization: Bearer <token>
+
+成功响应 (200):
+{
+    "message": "用户已删除",
+    "user": {
+        "id": 1,
+        "username": "user1"
+    }
+}
+
+3.5 重置用户密码
+URL: PUT /api/admin/users/:id/reset-password
+Headers: 
+- Authorization: Bearer <token>
+请求体：
+{
+    "newPassword": "123456"  // 可选，不提供则生成随机密码
+}
+
+成功响应 (200):
+{
+    "message": "密码已重置",
+    "user": {
+        "id": 1,
+        "username": "user1"
+    },
+    "newPassword": "123456"  // 如果是随机生成的密码才返回
 }
 
 4. 任务管理接口
@@ -206,7 +239,7 @@ Headers:
 4. 分页参数：
    - page: 从1开始
    - limit: 默认10，最大50
-5. 用户状态：
+5. 用户��态：
    - active: 正常
    - disabled: 禁用
 6. 任务状态：

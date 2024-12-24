@@ -7,7 +7,8 @@
     "start": "node app.js",
     "dev": "nodemon app.js --ignore '*.test.js' --ignore 'node_modules/*'",
     "migrate": "node migrations/add_ai_revise.js",
-    "migrate:https": "node migrations/update_urls_to_https.js"
+    "migrate:https": "node migrations/update_urls_to_https.js",
+    "migrate:timestamps": "node migrations/update_user_timestamps.js"
   },
   "keywords": [],
   "author": "",

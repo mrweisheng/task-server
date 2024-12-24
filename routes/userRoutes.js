@@ -80,16 +80,24 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: '用户名或密码错误' });
     }
 
+    // 添加用户状态检查
+    if (user.status === 'disabled') {
+      console.log('2. 用户已被禁用');
+      return res.status(403).json({ 
+        message: '账号已被禁用',
+        disabled_at: user.disabled_at,
+        disabled_reason: user.disabled_reason
+      });
+    }
+
     console.log('2. 数据库中的用户信息:', {
       id: user.id,
       username: user.username,
-      passwordHash: user.password
+      passwordHash: user.password,
+      status: user.status  // 添加状态日志
     });
 
     console.log('3. 开始验证密码');
-    console.log('   输入的密码:', password);
-    console.log('   数据库中的密码哈希:', user.password);
-
     const isMatch = await bcrypt.compare(password, user.password);
     console.log('4. 密码验证结果:', isMatch);
 

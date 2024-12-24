@@ -16,7 +16,12 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 // 中间件
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5173'  // Vite默认端口
+    : 'https://your-production-domain.com',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -122,11 +127,11 @@ sequelize.sync({ alter: false }).then(async () => {
   console.log('数据清理完成');
   
   // 现在可以安全地更新表结构
-  await sequelize.sync({ alter: true });
+  await sequelize.sync({ alter: false });
   console.log('数据库表结构已同步');
   
   app.listen(PORT, () => {
-    console.log(`服务器运行在���口 ${PORT}`);
+    console.log(`服务器运行在口 ${PORT}`);
     
     // 启动任务状态检查器
     startStatusChecker();
