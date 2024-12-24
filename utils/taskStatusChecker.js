@@ -2,7 +2,7 @@ const axios = require('axios');
 const Task = require('../models/Task');
 const { Op } = require('sequelize');
 
-const BASE_API = 'http://192.168.31.138:3000';
+const BASE_API = 'https://192.168.31.138:3000';
 
 // 状态映射
 const STATUS_MAP = {

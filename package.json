@@ -5,7 +5,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
-    "dev": "nodemon app.js --ignore '*.test.js' --ignore 'node_modules/*'"
+    "dev": "nodemon app.js --ignore '*.test.js' --ignore 'node_modules/*'",
+    "migrate": "node migrations/add_ai_revise.js",
+    "migrate:https": "node migrations/update_urls_to_https.js"
   },
   "keywords": [],
   "author": "",

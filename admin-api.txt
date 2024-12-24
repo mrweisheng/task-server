@@ -1,0 +1,216 @@
+管理员平台 API 文档
+=================
+
+0. 管理员注册（仅允许最多2个管理员）
+-------------
+URL: POST /api/admin/register
+Content-Type: application/json
+
+请求体：
+{
+    "username": "admin2",
+    "password": "123456",
+    "name": "管理员2",
+    "permissions": ["user_manage", "task_manage"]
+}
+
+成功响应 (201):
+{
+    "message": "管理员注册成功",
+    "admin": {
+        "id": 2,
+        "username": "admin2",
+        "name": "管理员2",
+        "permissions": ["user_manage", "task_manage"],
+        "created_at": "2024-03-20T10:00:00.000Z"
+    }
+}
+
+失败响应 (400):
+{
+    "message": "管理员数量已达到上限"
+}
+
+失败响应 (409):
+{
+    "message": "用户名已存在"
+}
+
+1. 管理员登录
+-------------
+URL: POST /api/admin/login
+Content-Type: application/json
+
+请求体：
+{
+    "username": "admin",
+    "password": "123456"
+}
+
+成功响应 (200):
+{
+    "message": "登录成功",
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "admin": {
+        "id": 1,
+        "username": "admin",
+        "name": "系统管理员",
+        "permissions": ["user_manage", "task_manage"]
+    }
+}
+
+失败响应 (401):
+{
+    "message": "用户名或密码错误"
+}
+
+2. 获取管理员信息
+----------------
+URL: GET /api/admin/profile
+Headers: 
+- Authorization: Bearer <token>
+
+成功响应 (200):
+{
+    "id": 1,
+    "username": "admin",
+    "name": "系统管理员",
+    "permissions": ["user_manage", "task_manage"],
+    "last_login_at": "2024-03-20T10:00:00.000Z"
+}
+
+失败响应 (401):
+{
+    "message": "认证失败"
+}
+
+3. 用户管理接口
+--------------
+3.1 获取用户列表
+URL: GET /api/admin/users
+Headers: 
+- Authorization: Bearer <token>
+Query 参数：
+- page: 页码（默认1）
+- limit: 每页数量（默认10）
+- search: 搜索关键词
+
+成功响应 (200):
+{
+    "total": 100,
+    "page": 1,
+    "limit": 10,
+    "users": [
+        {
+            "id": 1,
+            "username": "user1",
+            "nickname": "用户1",
+            "status": "active",
+            "created_at": "2024-03-20T10:00:00.000Z"
+        }
+    ]
+}
+
+3.2 禁用用户
+URL: PUT /api/admin/users/:id/disable
+Headers: 
+- Authorization: Bearer <token>
+请求体：
+{
+    "reason": "违规操作"
+}
+
+成功响应 (200):
+{
+    "message": "用户已禁用",
+    "user": {
+        "id": 1,
+        "username": "user1",
+        "status": "disabled",
+        "disabled_at": "2024-03-20T10:00:00.000Z",
+        "disabled_by": 1,
+        "disabled_reason": "违规操作"
+    }
+}
+
+3.3 启用用户
+URL: PUT /api/admin/users/:id/enable
+Headers: 
+- Authorization: Bearer <token>
+
+成功响应 (200):
+{
+    "message": "用户已启用",
+    "user": {
+        "id": 1,
+        "username": "user1",
+        "status": "active"
+    }
+}
+
+4. 任务管理接口
+--------------
+4.1 获取所有任务
+URL: GET /api/admin/tasks
+Headers: 
+- Authorization: Bearer <token>
+Query 参数：
+- page: 页码（默认1）
+- limit: 每页数量（默认10）
+- status: 任务状态筛选
+- user_id: 用户ID筛选
+- start_date: 开始日期
+- end_date: 结束日期
+
+成功响应 (200):
+{
+    "total": 100,
+    "page": 1,
+    "limit": 10,
+    "tasks": [
+        {
+            "id": 1,
+            "user_id": 1,
+            "content": "任务内容",
+            "numbers": ["13812345678"],
+            "status": "待处理",
+            "created_at": "2024-03-20T10:00:00.000Z",
+            "user": {
+                "username": "user1",
+                "nickname": "用户1"
+            }
+        }
+    ]
+}
+
+4.2 获取任务统计
+URL: GET /api/admin/tasks/stats
+Headers: 
+- Authorization: Bearer <token>
+
+成功响应 (200):
+{
+    "total": 100,
+    "pending": 20,
+    "processing": 30,
+    "completed": 40,
+    "failed": 10,
+    "today_total": 15,
+    "today_completed": 8
+}
+
+注意事项：
+1. 所有接口都需要管理员token认证
+2. token格式：Bearer <token>
+3. 时间格式统一使用ISO格式
+4. 分页参数：
+   - page: 从1开始
+   - limit: 默认10，最大50
+5. 用户状态：
+   - active: 正常
+   - disabled: 禁用
+6. 任务状态：
+   - 待处理
+   - 处理中
+   - 已完成
+   - 失败 

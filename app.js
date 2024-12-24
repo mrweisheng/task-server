@@ -11,6 +11,7 @@ const User = require('./models/User');
 const Task = require('./models/Task');
 const { Op } = require('sequelize');
 const { startStatusChecker } = require('./utils/taskStatusChecker');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -75,6 +76,7 @@ app.get('/', (req, res) => {
 app.use('/api/user', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 处理
 app.use((req, res, next) => {
@@ -124,7 +126,7 @@ sequelize.sync({ alter: false }).then(async () => {
   console.log('数据库表结构已同步');
   
   app.listen(PORT, () => {
-    console.log(`服务器运行在端口 ${PORT}`);
+    console.log(`服务器运行在���口 ${PORT}`);
     
     // 启动任务状态检查器
     startStatusChecker();

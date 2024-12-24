@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-// 直接使用明文 URL
-const TASK_EXECUTOR_API = 'http://192.168.31.138:3000/api/task/create';
+// 修改为 HTTPS
+const TASK_EXECUTOR_API = 'https://192.168.31.138:3000/api/task/create';
 
 async function notifyTaskExecutor(task) {
   try {
