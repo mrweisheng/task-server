@@ -16,12 +16,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const app = express();
 
 // 中间件
-app.use(cors({
-  origin: process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:5173'  // Vite默认端口
-    : 'https://your-production-domain.com',
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
